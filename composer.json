@@ -1,11 +1,11 @@
 {
-  "name": "geo6/php-gdal-wrapper",
+  "name": "datasmart/php-gdal-wrapper",
   "description": "PHP Library to use GDAL functions",
   "type": "library",
   "license": "GPL-3.0-or-later",
   "autoload": {
     "psr-4": {
-      "Geo6\\GDAL\\": "src/"
+      "Datasmart\\GDAL\\": "src/"
     }
   },
   "authors": [
@@ -15,9 +15,9 @@
     }
   ],
   "require": {
-    "symfony/process": "^3.3|^4.0|^5.0"
+    "symfony/process": "^7.2"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "^3.3"
+    "squizlabs/php_codesniffer": "^3.6"
   }
 }
