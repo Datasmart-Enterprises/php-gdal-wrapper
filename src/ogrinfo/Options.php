@@ -6,14 +6,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * PHP version 7
+ * PHP version 8.3
  *
  * @license GPL License
  */
 
-declare(strict_types=1);
-
-namespace Geo6\GDAL\ogrinfo;
+namespace Datasmart\GDAL\ogrinfo;
 
 /**
  * @author Jonathan Beliën <jbe@geo6.be>
