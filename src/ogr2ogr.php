@@ -10,8 +10,6 @@
  * @license GPL License
  */
 
-declare(strict_types=1);
-
 namespace Datasmart\GDAL;
 
 use Datasmart\GDAL\ogr2ogr\Options;
