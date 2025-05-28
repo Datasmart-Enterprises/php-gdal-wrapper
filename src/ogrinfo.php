@@ -10,10 +10,9 @@
  * @license GPL License
  */
 
-declare(strict_types=1);
+namespace Datasmart\GDAL;
 
-namespace Geo6\GDAL;
-
+use Datasmart\GDAL\ogrinfo\Options;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -26,25 +25,10 @@ use Symfony\Component\Process\Process;
  */
 class ogrinfo
 {
-    /**
-     * @var string
-     */
-    private $_command;
-
-    /**
-     * @var string{}
-     */
-    private $_options;
-
-    /**
-     * @var string
-     */
-    private $_source;
-
-    /**
-     * @var string[]
-     */
-    private $_layers;
+    private string $command = '';
+    private ogrinfo\Options $options;
+    private string $source;
+    private array $layers;
 
     /**
      * @param string   $source Datasource.
@@ -52,13 +36,13 @@ class ogrinfo
      *
      * @return void
      */
-    public function __construct(string $source, $layers = [])
+    public function __construct(string $source, string|array $layers = [])
     {
-        $this->_source = $source;
-        $this->_layers = (is_string($layers) ? [$layers] : $layers);
-        $this->_options = new ogrinfo\Options();
+        $this->source = $source;
+        $this->layers = (is_string($layers) ? [$layers] : $layers);
+        $this->options = new ogrinfo\Options();
 
-        $this->_setCommand();
+        $this->assembleCommand();
     }
 
     /**
@@ -67,112 +51,152 @@ class ogrinfo
      *
      * @return void
      */
-    public function setOption(string $name, $value = true): void
+    public function setOption(string $name, mixed $value = true): void
     {
-        $this->_options->{$name} = $value;
+        $this->options->{$name} = $value;
 
-        $this->_setCommand();
+        $this->assembleCommand();
     }
 
     /**
-     * @return string
+     * @return void
      */
-    private function _setCommand(): string
+    private function assembleCommand(): void
     {
         $options = '';
-        if ($this->_options->helpGeneral === true) {
+        if ($this->options->help === true) {
+            $options .= ' --help';
+        }
+        if ($this->options->helpGeneral === true) {
             $options .= ' --help-general';
         }
-        if ($this->_options->ro === true) {
+        if (!empty($this->options->if)) {
+            $options .= sprintf(
+                ' -if %s',
+                escapeshellarg($this->options->if->value)
+            );
+        }
+        if ($this->options->json === true) {
+            $options .= ' -json';
+        }
+        if ($this->options->ro === true) {
             $options .= ' -ro';
         }
-        if ($this->_options->q === true) {
-            $options .= ' -q';
+        if ($this->options->features === true) {
+            $options .= ' -features';
         }
-        if (!empty($this->_options->where)) {
+        if (!empty($this->options->limit)) {
             $options .= sprintf(
-                ' -where %s',
-                escapeshellarg($this->_options->where)
+                ' -limit %s',
+                escapeshellarg((string)$this->options->limit)
             );
-        }
-        if (!empty($this->_options->spat)) {
-            $options .= sprintf(
-                ' -spat %f %f %f %f',
-                $this->_options->spat[0],
-                $this->_options->spat[1],
-                $this->_options->spat[2],
-                $this->_options->spat[3]
-            );
-        }
-        if (!empty($this->_options->geomfield)) {
-            $options .= sprintf(
-                ' -geomfield %s',
-                escapeshellarg($this->_options->geomfield)
-            );
-        }
-        if (!empty($this->_options->fid)) {
-            $options .= sprintf(
-                ' -fid %s',
-                $this->_options->fid
-            );
-        }
-        if (!empty($this->_options->sql)) {
-            $options .= sprintf(
-                ' -sql %s',
-                escapeshellarg($this->_options->sql)
-            );
-        }
-        if (!empty($this->_options->dialect)) {
-            $options .= sprintf(
-                ' -dialect %s',
-                escapeshellarg($this->_options->dialect)
-            );
-        }
-        if ($this->_options->al === true) {
-            $options .= ' -al';
-        }
-        if ($this->_options->rl === true) {
-            $options .= ' -rl';
-        }
-        if ($this->_options->so === true) {
-            $options .= ' -so';
-        }
-        if (!empty($this->_options->fields)) {
-            $options .= sprintf(
-                ' -fields %s',
-                escapeshellarg($this->_options->fields)
-            );
-        }
-        if (!empty($this->_options->geom)) {
-            $options .= sprintf(
-                ' -geom %s',
-                escapeshellarg($this->_options->geom)
-            );
-        }
-        if ($this->_options->formats === true) {
-            $options .= ' --formats';
-        }
-        if ($this->_options->nomd === true) {
-            $options .= ' -nomd';
-        }
-        if ($this->_options->listmdd === true) {
-            $options .= ' -listmdd';
-        }
-        if (!empty($this->_options->mdd)) {
-            $options .= sprintf(
-                ' -mdd %s',
-                escapeshellarg($this->_options->mdd)
-            );
-        }
-        if ($this->_options->nocount === true) {
-            $options .= ' -nocount';
-        }
-        if ($this->_options->noextent === true) {
-            $options .= ' -noextent--';
         }
 
-        if (!empty($this->_options->oo) && is_array($this->_options->oo)) {
-            foreach ($this->_options->oo as $name => $value) {
+        if ($this->options->q === true) {
+            $options .= ' -q';
+        }
+        if (!empty($this->options->where)) {
+            $options .= sprintf(
+                ' -where %s',
+                escapeshellarg($this->options->where)
+            );
+        }
+        if (!empty($this->options->dialect)) {
+            $options .= sprintf(
+                ' -dialect %s',
+                escapeshellarg($this->options->dialect->name)
+            );
+        }
+        if (!empty($this->options->spat)) {
+            $options .= sprintf(
+                ' -spat %s',
+                escapeshellarg($this->options->spat->getString())
+            );
+        }
+        if (!empty($this->options->geomfield)) {
+            $options .= sprintf(
+                ' -geomfield %s',
+                escapeshellarg($this->options->geomfield)
+            );
+        }
+        if (!empty($this->options->fielddomain)) {
+            $options .= sprintf(
+                ' -fielddomain %s',
+                escapeshellarg($this->options->fielddomain)
+            );
+        }
+        if (!empty($this->options->fid)) {
+            $options .= sprintf(
+                ' -fid %s',
+                $this->options->fid
+            );
+        }
+        if (!empty($this->options->sql)) {
+            $options .= sprintf(
+                ' -sql %s',
+                escapeshellarg($this->options->sql)
+            );
+        }
+        if (!empty($this->options->dialect)) {
+            $options .= sprintf(
+                ' -dialect %s',
+                escapeshellarg($this->options->dialect)
+            );
+        }
+        if ($this->options->al === true) {
+            $options .= ' -al';
+        }
+        if ($this->options->rl === true && empty($this->options->sql)) {
+            $options .= ' -rl';
+        }
+        if ($this->options->so === true) {
+            $options .= ' -so';
+        }
+        if ($this->options->fields === true) {
+            $options .= ' -fields=YES';
+        } elseif ($this->options->fields === false) {
+            $options .= ' -fields=NO';
+        }
+
+        if (
+            !empty($this->options->geom) &&
+            in_array($this->options->geom, Options::VALID_GEOMETRY_DUMP_TYPES, true)
+        ) {
+            $options .= sprintf(
+                ' -geom %s',
+                escapeshellarg($this->options->geom)
+            );
+        }
+        if ($this->options->formats === true) {
+            $options .= ' --formats';
+        }
+        if ($this->options->nomd === true) {
+            $options .= ' -nomd';
+        }
+        if ($this->options->listmdd === true) {
+            $options .= ' -listmdd';
+        }
+        if (!empty($this->options->mdd)) {
+            $options .= sprintf(
+                ' -mdd %s',
+                escapeshellarg($this->options->mdd)
+            );
+        }
+        if ($this->options->nocount === true) {
+            $options .= ' -nocount';
+        }
+        if ($this->options->noextent === true) {
+            $options .= ' -noextent';
+        }
+        if ($this->options->extend3D === true) {
+            $options .= ' -extend3D';
+        }
+        if ($this->options->nogeomtype === true) {
+            $options .= ' -nogeomtype';
+        }
+
+        if (!empty($this->options->oo)) {
+            foreach ($this->options->oo as $name => $value) {
                 $options .= sprintf(
                     ' -oo %s',
                     escapeshellarg(sprintf('%s=%s', $name, $value))
@@ -180,14 +204,23 @@ class ogrinfo
             }
         }
 
-        $this->_command = sprintf(
+        if (
+            !empty($this->options->wkt_format) &&
+            in_array($this->options->wkt_format, Options::VALID_WKT_FORMATS, true)
+        ) {
+            $options .= sprintf(
+                ' -wkt_format %s',
+                escapeshellarg($this->options->wkt_format)
+            );
+        }
+
+        $this->command = sprintf(
             'ogrinfo %s %s %s',
             $options,
-            preg_match('/^[a-z]{2,}:/i', $this->_source) === 1 ? $this->_source : escapeshellarg($this->_source),
-            implode(' ', $this->_layers)
+            preg_match('/^[a-z]{2,}:/i', $this->source) === 1 ? $this->source : escapeshellarg($this->source),
+            implode(' ', $this->layers)
         );
 
-        return $this->_command;
     }
 
     /**
@@ -195,7 +228,7 @@ class ogrinfo
      */
     public function getCommand(): string
     {
-        return $this->_command;
+        return $this->command;
     }
 
     /**
@@ -208,13 +241,9 @@ class ogrinfo
      */
     public function run(?callable $callback = null, array $env = []): string
     {
-        $process = new Process($this->_command);
+        $process = Process::fromShellCommandline($this->getCommand());
         $process->mustRun($callback, $env);
-
-        // executes after the command finishes
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
+        $process->wait();
 
         return $process->getOutput();
     }
