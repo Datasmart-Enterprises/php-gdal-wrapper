@@ -26,41 +26,20 @@ use Symfony\Component\Process\Process;
 class ogr2ogr
 {
     /**
-     * @var string
-     */
-    private string $command = '';
-
-    private ogr2ogr\Options $options;
-
-    /**
-     * @var string
-     */
-    private string $destination;
-
-    /**
-     * @var string
-     */
-    private string $source;
-
-    /**
-     * @var string[]
-     */
-    private array $layers;
-
-    /**
      * @param string   $destination Destination datasource.
      * @param string   $source      Source datasource.
      * @param string[] $layers      Layers from source datasource (optional).
      *
      * @return void
      */
-    public function __construct(string $destination, string $source, string|array $layers = [])
+    public function __construct(
+        private readonly string  $destination,
+        private readonly string  $source,
+        private readonly array   $layers,
+        private readonly Options $options,
+        private string           $command = ''
+    )
     {
-        $this->destination = $destination;
-        $this->source = $source;
-        $this->layers = (is_string($layers) ? [$layers] : $layers);
-        $this->options = new ogr2ogr\Options();
-
         $this->assembleCommand();
     }
 

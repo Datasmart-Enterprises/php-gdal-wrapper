@@ -25,22 +25,19 @@ use Symfony\Component\Process\Process;
  */
 class ogrinfo
 {
-    private string $command = '';
-    private ogrinfo\Options $options;
-    private string $source;
-    private array $layers;
-
     /**
      * @param string   $source Datasource.
      * @param string[] $layers Layers from datasource (optional).
      *
      * @return void
      */
-    public function __construct(string $source, string|array $layers = [])
+    public function __construct(
+        private readonly string  $source,
+        private readonly array   $layers,
+        private readonly Options $options,
+        private string           $command = ''
+    )
     {
-        $this->source = $source;
-        $this->layers = (is_string($layers) ? [$layers] : $layers);
-        $this->options = new ogrinfo\Options();
 
         $this->assembleCommand();
     }
