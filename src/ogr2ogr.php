@@ -14,6 +14,8 @@ namespace Datasmart\GDAL;
 
 use Datasmart\GDAL\ogr2ogr\Options;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -471,7 +473,7 @@ class ogr2ogr
     /**
      * @param callable|null $callback
      * @param array         $env      An array of additional env vars to set when running the process
-     * @throws ProcessFailedException if the process is not successful.
+     * @throws ProcessFailedException|ProcessSignaledException|ProcessTimedOutException if the process is not successful.
      * @return string
      */
     public function run(?callable $callback = null, array $env = []): string
