@@ -126,6 +126,8 @@ enum VectorFormat: string
     case Selafin = 'Selafin';
     /** Norwegian SOSI Standard */
     case SOSI = 'SOSI';
+    /** SQLite/Spatialite RDMBS */
+    case SQLite = 'SQLite';
     /** SXF */
     case SXF = 'SXF';
     /** TopoJSON driver */
