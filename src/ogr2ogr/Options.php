@@ -310,5 +310,11 @@ class Options
      */
     public bool $resolveDomains = false;
 
+
+    /**
+     * This value controls the underlying Symfony Process' timeout value
+     */
+    public ?int $processTimeout = null;
+
     public const array VALID_POLYNOMIAL_ORDERS = [1, 2, 3];
 }

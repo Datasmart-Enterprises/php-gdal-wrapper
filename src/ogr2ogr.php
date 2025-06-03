@@ -489,6 +489,9 @@ class ogr2ogr
         if (!empty($this->input)) {
             $process->setInput($this->input);
         }
+        if (!empty($this->options->processTimeout)) {
+            $process->setTimeout($this->options->processTimeout);
+        }
         $process->mustRun($callback, $env);
         $process->wait();
 
