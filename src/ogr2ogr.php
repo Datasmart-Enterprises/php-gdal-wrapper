@@ -17,6 +17,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Traversable;
 
 /**
  * Implements `ogr2ogr` function.
@@ -35,11 +36,12 @@ class ogr2ogr
      * @return void
      */
     public function __construct(
-        private readonly string  $destination,
-        private readonly string  $source,
-        private readonly array   $layers,
-        private readonly Options $options,
-        private string           $command = ''
+        private readonly string                  $destination,
+        private readonly string                  $source,
+        private readonly array                   $layers,
+        private readonly Options                 $options,
+        private string                           $command = '',
+        private null|string|Process|Traversable  $input = null,
     )
     {
         $this->assembleCommand();
@@ -54,6 +56,11 @@ class ogr2ogr
     {
         $this->options->{$name} = $value;
         $this->assembleCommand();
+    }
+
+    public function setInput(Process|Traversable|string|null $input): void
+    {
+        $this->input = $input;
     }
 
     /**
@@ -479,6 +486,9 @@ class ogr2ogr
     public function run(?callable $callback = null, array $env = []): string
     {
         $process = Process::fromShellCommandline($this->getCommand());
+        if (!empty($this->input)) {
+            $process->setInput($this->input);
+        }
         $process->mustRun($callback, $env);
         $process->wait();
 
