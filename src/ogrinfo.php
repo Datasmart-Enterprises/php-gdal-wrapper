@@ -27,6 +27,8 @@ use Symfony\Component\Process\Process;
  */
 class ogrinfo
 {
+    private ?Process $process;
+
     /**
      * @param string   $source Datasource.
      * @param string[] $layers Layers from datasource (optional).
@@ -55,6 +57,11 @@ class ogrinfo
         $this->options->{$name} = $value;
 
         $this->assembleCommand();
+    }
+
+    public function getProcess(): ?Process
+    {
+        return $this->process;
     }
 
     /**
@@ -240,10 +247,13 @@ class ogrinfo
      */
     public function run(?callable $callback = null, array $env = []): string
     {
-        $process = Process::fromShellCommandline($this->getCommand());
-        $process->mustRun($callback, $env);
-        $process->wait();
+        $this->process = Process::fromShellCommandline($this->getCommand());
+        if (!empty($this->options->processTimeout)) {
+            $this->process->setTimeout($this->options->processTimeout);
+        }
+        $this->process->mustRun($callback, $env);
+        $this->process->wait();
 
-        return $process->getOutput();
+        return $this->process->getOutput();
     }
 }

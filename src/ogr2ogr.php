@@ -28,6 +28,8 @@ use Traversable;
  */
 class ogr2ogr
 {
+    private ?Process $process;
+
     /**
      * @param string   $destination Destination datasource.
      * @param string   $source      Source datasource.
@@ -61,6 +63,11 @@ class ogr2ogr
     public function setInput(Process|Traversable|string|null $input): void
     {
         $this->input = $input;
+    }
+
+    public function getProcess(): ?Process
+    {
+        return $this->process;
     }
 
     /**
@@ -485,16 +492,16 @@ class ogr2ogr
      */
     public function run(?callable $callback = null, array $env = []): string
     {
-        $process = Process::fromShellCommandline($this->getCommand());
+        $this->process = Process::fromShellCommandline($this->getCommand());
         if (!empty($this->input)) {
-            $process->setInput($this->input);
+            $this->process->setInput($this->input);
         }
         if (!empty($this->options->processTimeout)) {
-            $process->setTimeout($this->options->processTimeout);
+            $this->process->setTimeout($this->options->processTimeout);
         }
-        $process->mustRun($callback, $env);
-        $process->wait();
+        $this->process->mustRun($callback, $env);
+        $this->process->wait();
 
-        return $process->getOutput();
+        return $this->process->getOutput();
     }
 }

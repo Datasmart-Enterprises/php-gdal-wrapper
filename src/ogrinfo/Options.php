@@ -171,4 +171,9 @@ class Options
      * Added in version 3.7.
      */
     public bool $json = false;
+
+    /**
+     * This value controls the underlying Symfony Process' timeout value
+     */
+    public ?int $processTimeout = null;
 }
