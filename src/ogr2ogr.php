@@ -361,9 +361,14 @@ class ogr2ogr
             $options .= ' -unsetDefault';
         }
         if (!empty($this->options->fieldTypeToString)) {
+            foreach($this->options->fieldTypeToString as $fieldType) {
+                $stringOfFieldTypes = $fieldType->name . ',';
+            }
+            $stringOfFieldTypes = rtrim($stringOfFieldTypes, ',');
+
             $options .= sprintf(
                 ' -fieldTypeToString %s',
-                escapeshellarg(implode(',', $this->options->fieldTypeToString))
+                escapeshellarg($stringOfFieldTypes)
             );
         }
         if ($this->options->unsetFieldWidth === true) {
