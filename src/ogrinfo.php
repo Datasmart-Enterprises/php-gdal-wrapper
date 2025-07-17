@@ -143,12 +143,6 @@ class ogrinfo
                 escapeshellarg($this->options->sql)
             );
         }
-        if (!empty($this->options->dialect)) {
-            $options .= sprintf(
-                ' -dialect %s',
-                escapeshellarg($this->options->dialect)
-            );
-        }
         if ($this->options->al === true) {
             $options .= ' -al';
         }
