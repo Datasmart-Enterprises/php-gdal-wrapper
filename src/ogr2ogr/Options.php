@@ -135,7 +135,7 @@ class Options
     public array $ct_opt = [];
     /** Format/driver name to be attempted to open the input file(s). It is generally not necessary to specify it, but it can be used to skip automatic driver detection, when it fails to select the appropriate driver. This option can be repeated several times to specify several candidate drivers. Note that it does not force those drivers to open the dataset. In particular, some drivers have requirements on file extensions.
 
-    Added in version 3.2. */
+    Added in version 3.8.2. (docs claim version 3.2, but code to run the option wasn't added until 3.8.2) */
     public ?VectorFormat $if = null;
     /** Output file format name, e.g. ESRI Shapefile, MapInfo File, PostgreSQL. Starting with GDAL 2.3, if not specified, the format is guessed from the extension (previously was ESRI Shapefile). */
     public ?VectorFormat $f = null;
