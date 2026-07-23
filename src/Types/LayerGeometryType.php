@@ -23,7 +23,7 @@ class LayerGeometryType
         private string $coordinates = '',
         private bool $convertToLinear = false,
         private bool $convertToCurve = false,
-        private bool $convertToMulti = false,
+        private bool $promoteToMulti = false,
     )
     {
     }
@@ -45,22 +45,22 @@ class LayerGeometryType
         return $this->geometryType->name;
     }
 
-    public function getString()
+    public function getString(): string
     {
         $string = '';
 
         if ($this->convertToLinear === true) {
-            $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_CONVERT_TO_LINEAR) . ' ';
+            $string .= sprintf(" -nlt %s ", escapeshellarg(self::SUBCOMMAND_CONVERT_TO_LINEAR));
         }
         if ($this->convertToCurve === true) {
-            $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_CONVERT_TO_CURVE) . ' ';
+            $string .= sprintf(" -nlt %s ", escapeshellarg(self::SUBCOMMAND_CONVERT_TO_CURVE));
         }
-        if ($this->convertToMulti === true) {
-            $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_PROMOTE_TO_MULTI) . ' ';
+        if ($this->promoteToMulti === true) {
+            $string .= sprintf(" -nlt %s ", escapeshellarg(self::SUBCOMMAND_PROMOTE_TO_MULTI));
         }
         if (empty($string)) {
             $coordinates = !empty($this->coordinates) ? escapeshellarg($this->coordinates) : '';
-            $string = "-nlt {$this->getGeometryTypeName(true)} . $coordinates";
+            $string = sprintf(" -nlt %s . %s", $this->getGeometryTypeName(true), $coordinates);
         }
         return $string;
     }
@@ -100,9 +100,9 @@ class LayerGeometryType
         $this->convertToCurve = $convertToCurve;
     }
 
-    public function setConvertToMulti(bool $convertToMulti): void
+    public function setPromoteToMulti(bool $promoteToMulti): void
     {
-        $this->convertToMulti = $convertToMulti;
+        $this->promoteToMulti = $promoteToMulti;
     }
 
     public function setCoordinates(string $coordinates): void
