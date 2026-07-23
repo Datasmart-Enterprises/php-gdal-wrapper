@@ -14,7 +14,7 @@ class LayerGeometryType
     private const string MEASURE_INDICATOR = 'M';
     private const string SUBCOMMAND_CONVERT_TO_LINEAR = 'CONVERT_TO_LINEAR';
     private const string SUBCOMMAND_CONVERT_TO_CURVE = 'CONVERT_TO_CURVE';
-    private const string SUBCOMMAND_CONVERT_TO_MULTI = 'CONVERT_TO_MULTI';
+    private const string SUBCOMMAND_PROMOTE_TO_MULTI = 'PROMOTE_TO_MULTI';
 
     private function __construct(
         private GeometryType $geometryType,
@@ -56,7 +56,7 @@ class LayerGeometryType
             $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_CONVERT_TO_CURVE) . ' ';
         }
         if ($this->convertToMulti === true) {
-            $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_CONVERT_TO_MULTI) . ' ';
+            $string .= '-nlt ' . escapeshellarg(self::SUBCOMMAND_PROMOTE_TO_MULTI) . ' ';
         }
         if (empty($string)) {
             $coordinates = !empty($this->coordinates) ? escapeshellarg($this->coordinates) : '';
